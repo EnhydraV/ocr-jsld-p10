@@ -1,0 +1,21 @@
+name: ycyw-poc-chat
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ycyw
+      POSTGRES_PASSWORD: ycyw-dev
+      POSTGRES_DB: ycyw_chat
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ycyw -d ycyw_chat"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

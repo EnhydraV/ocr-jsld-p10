@@ -1,0 +1,76 @@
+// Sous-ensemble "chat" du modèle de données cible (proposition d'architecture, modèle de
+// données, partie chat). Les clients et conseillers ne sont pas des tables ici : ils sont
+// identifiés par le sujet de leur jeton (Keycloak dans la cible, émetteur de développement
+// dans la PoC). Tables et colonnes en snake_case, comme le reste du modèle.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ConversationTopic {
+  reservation
+  payment
+  account
+  other
+
+  @@map("conversation_topic")
+}
+
+enum ConversationStatus {
+  waiting
+  open
+  resolved
+
+  @@map("conversation_status")
+}
+
+enum MessageAuthor {
+  customer
+  advisor
+  system
+
+  @@map("message_author")
+}
+
+model Conversation {
+  id             String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId     String             @map("customer_id")
+  advisorId      String?            @map("advisor_id")
+  reservationRef String?            @map("reservation_ref")
+  topic          ConversationTopic  @default(other)
+  status         ConversationStatus @default(waiting)
+  /// Dernier numéro d'ordre attribué ; incrémenté dans la transaction qui insère un message.
+  /// La ligne verrouillée sérialise les écritures d'une même conversation, y compris entre
+  /// deux instances du service.
+  lastSeq        Int                @default(0) @map("last_seq")
+  openedAt       DateTime           @default(now()) @map("opened_at") @db.Timestamptz
+  resolvedAt     DateTime?          @map("resolved_at") @db.Timestamptz
+  messages       Message[]
+
+  @@index([customerId, openedAt(sort: Desc)])
+  @@index([status, openedAt])
+  @@map("conversation")
+}
+
+model Message {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversationId String        @map("conversation_id") @db.Uuid
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  /// Numéro d'ordre dans la conversation : la resynchronisation demande "tout ce qui est
+  /// postérieur à N", sans doublon ni trou.
+  seq            Int
+  authorType     MessageAuthor @map("author_type")
+  authorId       String        @map("author_id")
+  body           String
+  sentAt         DateTime      @default(now()) @map("sent_at") @db.Timestamptz
+  deliveredAt    DateTime?     @map("delivered_at") @db.Timestamptz
+  readAt         DateTime?     @map("read_at") @db.Timestamptz
+
+  @@unique([conversationId, seq])
+  @@map("message")
+}
