@@ -5,4 +5,5 @@ docs/
 .env
 .next/
 coverage/
-generated/
+src/generated/
+*.tsbuildinfo

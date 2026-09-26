@@ -4,8 +4,9 @@
 // dans la PoC). Tables et colonnes en snake_case, comme le reste du modèle.
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
