@@ -15,3 +15,17 @@ export const historyQuerySchema = z.object({
 });
 
 export type HistoryQuery = z.infer<typeof historyQuerySchema>;
+
+export const subscribeSchema = z.object({
+  conversationId: z.uuid(),
+  // Dernier numero d'ordre recu par le client : ce qui suit lui est renvoye a l'abonnement.
+  afterSeq: z.number().int().min(0).optional(),
+});
+
+export type SubscribeInput = z.infer<typeof subscribeSchema>;
+
+export const socketSendSchema = sendMessageSchema.extend({
+  conversationId: z.uuid(),
+});
+
+export type SocketSendInput = z.infer<typeof socketSendSchema>;
