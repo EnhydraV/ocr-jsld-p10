@@ -2,6 +2,7 @@
 // sur le depot.
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ChatRepository, ConversationNotFound } from './chat.repository';
+import { ChatEvents } from './chat.events';
 import type { SendMessageInput } from './chat.schemas';
 import type { Conversation, Message } from '../generated/prisma/client';
 
@@ -12,7 +13,10 @@ export interface ConversationWithMessages {
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly repository: ChatRepository) {}
+  constructor(
+    private readonly repository: ChatRepository,
+    private readonly events: ChatEvents,
+  ) {}
 
   async history(conversationId: string, afterSeq?: number): Promise<ConversationWithMessages> {
     const conversation = await this.repository.findConversation(conversationId);
@@ -22,11 +26,14 @@ export class ChatService {
   }
 
   async send(conversationId: string, input: SendMessageInput): Promise<Message> {
+    let message: Message;
     try {
-      return await this.repository.appendMessage(conversationId, input.authorType, input.authorId, input.body);
+      message = await this.repository.appendMessage(conversationId, input.authorType, input.authorId, input.body);
     } catch (error) {
       if (error instanceof ConversationNotFound) throw new NotFoundException(error.message);
       throw error;
     }
+    this.events.publish(message);
+    return message;
   }
 }

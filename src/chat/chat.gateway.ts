@@ -1,7 +1,7 @@
 // Transport WebSocket du chat, deuxieme porte d'entree apres le controleur HTTP. Il valide
 // l'entree, appelle ChatService et rend le resultat ; aucune regle metier ici. Les messages
 // echanges suivent l'enveloppe de Nest, { "event": ..., "data": ... }.
-import { Logger } from '@nestjs/common';
+import { Logger, type OnModuleInit } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -14,6 +14,7 @@ import type { WebSocket } from 'ws';
 import type { ZodType } from 'zod';
 import { ChatService } from './chat.service';
 import { ChatSubscribers } from './chat.subscribers';
+import { ChatEvents } from './chat.events';
 import { socketSendSchema, subscribeSchema } from './chat.schemas';
 import { loadConfig } from '../config';
 import type { Message } from '../generated/prisma/client';
@@ -31,14 +32,21 @@ function validate<T>(schema: ZodType<T>, value: unknown, socket: WebSocket): T |
 }
 
 @WebSocketGateway()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit {
   private readonly logger = new Logger(ChatGateway.name);
   private readonly instanceName = loadConfig().instanceName;
 
   constructor(
     private readonly chat: ChatService,
     private readonly subscribers: ChatSubscribers,
+    private readonly events: ChatEvents,
   ) {}
+
+  onModuleInit(): void {
+    this.events.onMessage((message) => {
+      this.broadcast(message.conversationId, message);
+    });
+  }
 
   // L'instance est annoncee des la connexion : c'est ce qui rend visible, depuis deux
   // fenetres, qu'elles ne parlent pas au meme processus.
@@ -76,7 +84,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     push(socket, 'sent', { seq: message.seq });
-    this.broadcast(input.conversationId, message);
   }
 
   private broadcast(conversationId: string, message: Message): void {
