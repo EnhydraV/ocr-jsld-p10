@@ -42,6 +42,9 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "demo:up": "docker compose --profile demo up -d --build",
+    "demo:down": "docker compose --profile demo down",
+    "demo:logs": "docker compose --profile demo logs -f"
   }
 }

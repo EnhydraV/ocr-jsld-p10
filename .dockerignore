@@ -1,0 +1,10 @@
+node_modules
+dist
+src/generated
+docs
+web
+screenshots
+.brief
+.git
+.env
+*.tsbuildinfo

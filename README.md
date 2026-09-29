@@ -18,6 +18,27 @@ Elle démontre trois choses :
 - Node.js 24 ou plus récent (`node --version`).
 - Docker, pour la base PostgreSQL.
 
+## Tout lancer d'un coup
+
+Base, service et client web dans trois conteneurs, avec les migrations et le jeu de
+démonstration appliqués au passage :
+
+```bash
+npm run demo:up      # construit les images au besoin, puis démarre
+```
+
+- `http://localhost:3100` : le client web.
+- `http://localhost:3000/health` : le service.
+
+`npm run demo:logs` suit les journaux, `npm run demo:down` arrête tout. Les migrations et le
+seed tournent dans un conteneur qui s'arrête ensuite, et comme les deux sont rejouables, la
+commande se relance sans risque.
+
+C'est le chemin à préférer pour faire tourner la démonstration : les versions de Node, des
+dépendances et de PostgreSQL viennent des images, donc le poste n'a besoin que de Docker. La
+mise en route pas à pas ci-dessous reste utile pour développer, avec le rechargement
+automatique.
+
 ## Première mise en route
 
 Du dépôt cloné au premier message échangé. Chaque étape est rejouable : la relancer ne casse

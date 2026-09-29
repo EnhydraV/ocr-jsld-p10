@@ -1,5 +1,10 @@
 name: ycyw-poc-chat
 
+# La base seule suffit pour developper (npm run db:up). Les profils "demo" ajoutent le
+# service et le client web, pour une pile complete en une commande.
+
+x-database-url: &database-url postgresql://ycyw:ycyw-dev@postgres:5432/ycyw_chat
+
 services:
   postgres:
     image: postgres:18-alpine
@@ -16,6 +21,46 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # Applique les migrations et pose la conversation de demonstration, puis s'arrete. Les
+  # deux operations sont rejouables, donc ce service peut tourner a chaque demarrage.
+  migrate:
+    profiles: ["demo"]
+    build:
+      context: .
+      target: build
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed"
+    environment:
+      DATABASE_URL: *database-url
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  chat:
+    profiles: ["demo"]
+    build:
+      context: .
+    environment:
+      DATABASE_URL: *database-url
+      PORT: "3000"
+      INSTANCE_NAME: A
+    ports:
+      - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    profiles: ["demo"]
+    build:
+      context: ./web
+      args:
+        # Adresse utilisee par le navigateur de l'utilisateur, hors du reseau des conteneurs.
+        NEXT_PUBLIC_CHAT_URL: ws://localhost:3000
+    ports:
+      - "3100:3100"
+    depends_on:
+      - chat
 
 volumes:
   pgdata:
