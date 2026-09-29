@@ -1,0 +1,49 @@
+@use '../styles/variables' as *;
+
+.home {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 1.6rem;
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(to right, $orange 50%, $blue 50%) 1;
+  padding-bottom: 8px;
+}
+
+.lead {
+  color: $ink-soft;
+}
+
+.links {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  margin: 24px 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px;
+  font-weight: 600;
+  color: $ink;
+  text-decoration: none;
+  background: $surface;
+  border: 1px solid $line;
+  border-radius: $radius-small;
+
+  span {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: $ink-soft;
+  }
+
+  &:hover {
+    border-color: $blue;
+  }
+}

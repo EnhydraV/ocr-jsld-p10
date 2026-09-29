@@ -1,5 +1,5 @@
-// Jeu de donnees de demonstration : une conversation ouverte par Charlie (client) au sujet
-// d'une reservation, en attente d'un conseiller. Rejouable : la conversation est identifiee.
+// Jeu de données de démonstration : une conversation ouverte par Charlie (client) au sujet
+// d'une réservation, en attente d'un conseiller. Rejouable : la conversation est identifiée.
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
@@ -26,13 +26,13 @@ async function main(): Promise<void> {
             seq: 1,
             authorType: 'customer',
             authorId: 'charlie',
-            body: 'Bonjour, puis-je encore modifier la date de retour de ma reservation ?',
+            body: 'Bonjour, puis-je encore modifier la date de retour de ma réservation ?',
           },
         },
       },
     });
     const messages = await prisma.message.count();
-    console.log(`Jeu de donnees en place : ${messages} message(s).`);
+    console.log(`Jeu de données en place : ${messages} message(s).`);
   } finally {
     await prisma.$disconnect();
   }

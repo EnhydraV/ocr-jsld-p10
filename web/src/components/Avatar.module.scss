@@ -1,0 +1,17 @@
+@use '../styles/variables' as *;
+
+.avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $surface;
+  background: $ink-soft;
+}

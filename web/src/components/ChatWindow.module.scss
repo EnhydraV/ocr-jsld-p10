@@ -1,0 +1,59 @@
+@use '../styles/variables' as *;
+
+.window {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 44rem;
+  margin: 0 auto;
+  background: $surface;
+  border-inline: 1px solid $line;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: $surface;
+  // Marqueur bicolore de la charte, repris des documents du projet.
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(to right, $orange 50%, $blue 50%) 1;
+}
+
+.identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.error {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  color: $ink;
+  background: #fff1ec;
+  border-bottom: 1px solid $line;
+}
+
+.reference {
+  margin: 1px 0 0;
+  font-size: 0.8rem;
+  color: $ink-soft;
+}
+
+// Seule l'anomalie se montre : une liaison qui fonctionne est l'etat attendu, l'afficher
+// en permanence n'apprend rien.
+.interrupted {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  color: $ink;
+  background: #fff1ec;
+  border-bottom: 1px solid $line;
+}

@@ -7,3 +7,4 @@ docs/
 coverage/
 src/generated/
 *.tsbuildinfo
+next-env.d.ts

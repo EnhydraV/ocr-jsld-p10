@@ -66,7 +66,7 @@ Attendu la première fois : `The following migration(s) have been applied`. Ensu
 npm run db:seed
 ```
 
-Attendu : `Jeu de donnees en place : 1 message(s).` La conversation est identifiée, donc la
+Attendu : `Jeu de données en place : 1 message(s).` La conversation est identifiée, donc la
 rejouer ne crée pas de seconde copie.
 
 **7. Compiler, puis lancer.**
@@ -153,6 +153,36 @@ socket.on("open", () => {
 
 Ouvrez deux terminaux avec cette commande : ce que l'un envoie s'affiche dans l'autre.
 
+## Le client web
+
+Deux fenêtres, une par rôle, dans `web/`. Elles se connectent à la passerelle du service.
+
+```bash
+cd web
+npm install
+npm run build
+npm start          # http://localhost:3100
+```
+
+- `http://localhost:3100/client` : la vue de Charlie, qui a réservé.
+- `http://localhost:3100/conseiller` : la vue de Victor, au service client.
+
+La page d'accueil donne les deux liens.
+
+![Page d'accueil : un titre et deux cartes cliquables, vers la vue client et vers la vue
+conseiller.](screenshots/accueil.png)
+
+Ouvrez les deux dans deux fenêtres côte à côte : ce que l'une envoie apparaît dans l'autre.
+
+![La même conversation vue par le client, à gauche, et par le conseiller, à droite. Les
+messages de chacun apparaissent à droite de sa propre fenêtre, en bleu, et ceux de son
+interlocuteur à gauche, en gris.](screenshots/deux-fenetres.png)
+
+Une fenêtre qui perd la connexion se reconnecte seule et rattrape les messages écrits pendant
+la coupure, à partir du dernier numéro d'ordre qu'elle avait reçu, sans doublon. Pour le voir,
+arrêtez le service pendant qu'une fenêtre est ouverte, écrivez par l'API depuis l'autre poste,
+puis relancez-le.
+
 ## Le numéro d'ordre des messages
 
 Chaque message porte un numéro d'ordre, `seq`, unique dans sa conversation et sans trou :
@@ -200,6 +230,7 @@ src/
     chat.subscribers.ts registre des connexions ouvertes
   prisma/              client Prisma branché sur le cycle de vie de Nest
   health/              sonde de vie
+web/                   client web Next.js, une vue par rôle
 ```
 
 Les deux transports, HTTP et WebSocket, appellent le même `ChatService`, donc les règles du
